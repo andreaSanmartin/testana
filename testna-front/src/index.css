@@ -1,0 +1,32 @@
+body {
+  background-color: var(--background-color);
+  color: var(--primary-color);
+  text-transform: none;
+  font-family: 'Garet Book', serif;
+  font-size: 20px; 
+  -webkit-user-select: none; 
+  -moz-user-select: none;   
+  -ms-user-select: none;     
+  user-select: none;  
+}
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@keyframes loading-bar {
+  0% {
+    width: 0%;
+  }
+  50% {
+    width: 100%;
+  }
+  100% {
+    width: 0%;
+  }
+}
+
+.animate-loading-bar {
+  animation: loading-bar 1.5s ease-in-out infinite;
+
+}
