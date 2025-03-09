@@ -5,7 +5,7 @@ import OrderList from './components/OrderList';
 import { AlertProvider } from './components/AlertContext';
 import OrderEdit from './components/OrderEdit';
 
-export const App = () => {
+const App = () => {
   return (
     <AlertProvider>
       <Router>
@@ -18,3 +18,5 @@ export const App = () => {
     </AlertProvider>
   );
 };
+
+export default App; 

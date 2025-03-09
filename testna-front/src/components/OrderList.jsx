@@ -5,6 +5,7 @@ import Slider from "./Slider";
 import { getAllOrders } from "../services/OrderService";
 import fond from '../assets/font_list.jpg';
 import { Link } from "react-router-dom";
+import './OrderList.css'; 
 
 const OrderList = () => {
   const [selectedOrder, setSelectedOrder] = useState(null);
@@ -21,57 +22,44 @@ const OrderList = () => {
   }, []);
 
   return (
-    <div className="relative text-title">
+    <div className="order-list-container">
       <div
-        style={{
-          backgroundImage: `url(${fond})`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          backgroundAttachment: 'fixed',
-          filter: 'blur(5px)',
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          width: '100%',
-          height: '100%',
-          zIndex: -1,
-        }}
+        className="background-image"
+        style={{ backgroundImage: `url(${fond})` }}
       ></div>
-      <div className="bg-tranparent">
+      <div className="content-wrapper">
         <Slider />
-        <div className="max-w-5xl mx-auto p-4 bg-white shadow rounded text-title mt-6">
-          <h1 className="text-2xl font-bold">Órdenes de compra</h1>
-          <table className="w-full border-collapse my-4">
+        <div className="orders-container">
+          <h1 className="orders-header">Órdenes de compra</h1>
+          <table className="orders-table">
             <thead>
               <tr>
-                <th className="border px-4 py-2">Código</th>
-                <th className="border px-4 py-2">Nombre Cliente</th>
-                <th className="border px-4 py-2">RUC Cliente</th>
-                <th className="border px-4 py-2">Fecha</th>
-                <th className="border px-4 py-2">Estado</th>
-                <th className="border px-4 py-2">Acciones</th>
+                <th>Código</th>
+                <th>Nombre Cliente</th>
+                <th>RUC Cliente</th>
+                <th>Fecha</th>
+                <th>Estado</th>
+                <th>Acciones</th>
               </tr>
             </thead>
             <tbody>
               {orders.map((order) => (
                 <tr key={order.ho_code}>
-                  <td className="border px-4 py-2">{order.ho_code}</td>
-                  <td className="border px-4 py-2">{order.ho_name}</td>
-                  <td className="border px-4 py-2">{order.ho_ruc}</td>
-                  <td className="border px-4 py-2">{new Date(order.ho_date_registration).toLocaleDateString('es-ES')}</td>
-                  <td className="border px-4 py-2">{order.ho_state_name}</td>
-                  <td className="border px-4 py-2 flex justify-center">
-                    <button onClick={() => setSelectedOrder(order)}
-                      className="mx-4">
-                      <FaEye className="text-blue-500 py-4 h-full" />
+                  <td>{order.ho_code}</td>
+                  <td>{order.ho_name}</td>
+                  <td>{order.ho_ruc}</td>
+                  <td>{new Date(order.ho_date_registration).toLocaleDateString('es-ES')}</td>
+                  <td>{order.ho_state_name}</td>
+                  <td className="actions-container">
+                    <button onClick={() => setSelectedOrder(order)} className="action-button">
+                      <FaEye className="icon-view" />
                     </button>
                     <Link
-                      to={{
-                        pathname: `/orders/edit/${order.ho_code}`,
-                        state: { order }
-                      }}
+                      to={`/orders/edit/${order.ho_code}`}
+                      state={{ order }} 
+                      className="action-button"
                     >
-                      <FaEdit className="text-green-500 py-4 h-full" />
+                      <FaEdit className="icon-edit" />
                     </Link>
                   </td>
                 </tr>

@@ -10,10 +10,6 @@ body {
   user-select: none;  
 }
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
 @keyframes loading-bar {
   0% {
     width: 0%;

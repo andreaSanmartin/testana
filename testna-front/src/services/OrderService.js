@@ -40,7 +40,7 @@ export const getAllOrders = async () => {
 // Function to update general information of order
 export const updateOrder = async (form) => {
   try {
-    const response = await apiClient.post(`${API_CLASS}save`, JSON.stringify(form));
+    const response = await apiClient.post(`${API_CLASS}update`, JSON.stringify(form));
     return response.data;
   } catch (error) {
     console.error('Error saving information', error);

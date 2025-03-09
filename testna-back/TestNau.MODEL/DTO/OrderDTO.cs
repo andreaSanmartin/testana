@@ -43,8 +43,8 @@ namespace TestNau.MODEL.DTO
     {
         public int? ho_code_i { get; set; }
         public int ho_cod_item { get; set; }
-        public string ho_item_name { get; set; }
-        public string ho_item_bar { get; set; }
+        public string? ho_item_name { get; set; }
+        public string? ho_item_bar { get; set; }
         public double ho_amount { get; set; }
         public double ho_price { get; set; }
         public double ho_total_item { get; set; }

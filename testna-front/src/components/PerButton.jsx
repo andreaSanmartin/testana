@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { IconContext } from 'react-icons';
+import './PerButton.css';
 
 const PerButton = ({ text = null, Icon = null, onClick, type = "button", loading = false, bg = "transparent" }) => {
   const defaultBorderColor = '#a37d23';
@@ -8,15 +9,14 @@ const PerButton = ({ text = null, Icon = null, onClick, type = "button", loading
   return (
     <button
       type={type}
-      className={`py-2 px-4 flex items-center justify-center rounded-lg w-full border-2
-      transition-colors duration-300 ease-in-out`}
+      className="per-button"
       onClick={onClick}
       disabled={loading}
       onMouseEnter={() => setHover(true)}
       onMouseLeave={() => setHover(false)}
       style={{
         borderColor: bg !== "transparent" ? bg : defaultBorderColor,
-        color: hover ? 'white' : (bg !== "transparent" ? bg : defaultBorderColor),
+        color: 'white', 
         backgroundColor: hover ? (bg !== "transparent" ? bg : defaultBorderColor) : 'transparent'
       }}
     >
@@ -24,17 +24,13 @@ const PerButton = ({ text = null, Icon = null, onClick, type = "button", loading
         <IconContext.Provider
           value={{
             size: '1.5em',
-            color: hover ? 'white' : (bg !== "transparent" ? bg : defaultBorderColor),
+            color: 'white', 
           }}
         >
-          <Icon className={`${text ? 'mr-4' : 'mx-auto'}`} />
+          <Icon className={text ? 'icon icon-with-text' : 'icon icon-alone'} />
         </IconContext.Provider>
       )}
-      {text && (
-        <span className="truncate overflow-hidden text-ellipsis whitespace-nowrap text-center">
-          {text}
-        </span>
-      )}
+      {text && <span className="text-content">{text}</span>}
     </button>
   );
 };

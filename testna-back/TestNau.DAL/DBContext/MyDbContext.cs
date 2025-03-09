@@ -1,5 +1,5 @@
 ﻿using Microsoft.Extensions.Configuration;
-using MySqlConnector; 
+using Npgsql; // Cambiar MySqlConnector por Npgsql
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -16,12 +16,12 @@ namespace TestNau.DAL.DBContext
 
         public MyDbContext(IConfiguration configuration)
         {
-            _connectionString = configuration.GetConnectionString("MysqlDBConnection"); 
+            _connectionString = configuration.GetConnectionString("PostgresqlDBConnection");
         }
 
         public void excecuteQuery(string query)
         {
-            var conn = new MySqlConnection(_connectionString); 
+            var conn = new NpgsqlConnection(_connectionString); 
             try
             {
                 if (conn.State == ConnectionState.Closed)
@@ -44,7 +44,7 @@ namespace TestNau.DAL.DBContext
 
         public void excecuteQuery(string query, object parameters)
         {
-            var conn = new MySqlConnection(_connectionString); 
+            var conn = new NpgsqlConnection(_connectionString); // Cambiar MySqlConnection por NpgsqlConnection
             try
             {
                 if (conn.State == ConnectionState.Closed)
@@ -67,7 +67,7 @@ namespace TestNau.DAL.DBContext
 
         public async Task excecuteQueryAsync(string query)
         {
-            var conn = new MySqlConnection(_connectionString); 
+            var conn = new NpgsqlConnection(_connectionString); // Cambiar MySqlConnection por NpgsqlConnection
             try
             {
                 if (conn.State == ConnectionState.Closed)
@@ -90,7 +90,7 @@ namespace TestNau.DAL.DBContext
 
         public async Task excecuteQueryAsync(string query, object parameters)
         {
-            var conn = new MySqlConnection(_connectionString); 
+            var conn = new NpgsqlConnection(_connectionString); // Cambiar MySqlConnection por NpgsqlConnection
             try
             {
                 if (conn.State == ConnectionState.Closed)
@@ -113,7 +113,7 @@ namespace TestNau.DAL.DBContext
 
         public List<T> getList<T>(string query)
         {
-            var conn = new MySqlConnection(_connectionString); 
+            var conn = new NpgsqlConnection(_connectionString); // Cambiar MySqlConnection por NpgsqlConnection
             try
             {
                 if (conn.State == ConnectionState.Closed)
@@ -133,7 +133,7 @@ namespace TestNau.DAL.DBContext
 
         public List<T> getList<T>(string query, object parameters)
         {
-            var conn = new MySqlConnection(_connectionString); 
+            var conn = new NpgsqlConnection(_connectionString); // Cambiar MySqlConnection por NpgsqlConnection
             try
             {
                 if (conn.State == ConnectionState.Closed)
@@ -153,7 +153,7 @@ namespace TestNau.DAL.DBContext
 
         public T getObject<T>(string query)
         {
-            var conn = new MySqlConnection(_connectionString); 
+            var conn = new NpgsqlConnection(_connectionString); // Cambiar MySqlConnection por NpgsqlConnection
             try
             {
                 if (conn.State == ConnectionState.Closed)
@@ -177,7 +177,7 @@ namespace TestNau.DAL.DBContext
 
         public T getObject<T>(string query, object parameters)
         {
-            var conn = new MySqlConnection(_connectionString);
+            var conn = new NpgsqlConnection(_connectionString); // Cambiar MySqlConnection por NpgsqlConnection
             try
             {
                 if (conn.State == ConnectionState.Closed)
@@ -202,12 +202,12 @@ namespace TestNau.DAL.DBContext
 
         public void excecuteProcedure(string query, Object parameters)
         {
-            var conn = new MySqlConnection(_connectionString); 
+            var conn = new NpgsqlConnection(_connectionString); // Cambiar MySqlConnection por NpgsqlConnection
             try
             {
                 if (conn.State == ConnectionState.Closed)
                     conn.Open();
-                SqlMapper.Query(conn, query, param: parameters, commandType: CommandType.Text, commandTimeout: 2800);
+                SqlMapper.Query(conn, query, param: parameters, commandType: CommandType.StoredProcedure, commandTimeout: 2800); // Cambiar CommandType.Text por CommandType.StoredProcedure
             }
             catch (Exception ex)
             {

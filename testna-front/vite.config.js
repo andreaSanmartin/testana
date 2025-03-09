@@ -3,19 +3,7 @@ import react from '@vitejs/plugin-react';
 
 export default defineConfig({
   plugins: [react()],
-  base: '/', 
-  server: {
-    open: true,
+  css: {
+    postcss: true, // Esto permite que Vite detecte `postcss.config.js` automáticamente
   },
-  resolve: {
-    alias: {
-      'pdfjs-dist/build/pdf.worker.entry': 'pdfjs-dist/build/pdf.worker.min.js'
-    }
-  },
-  build: {
-    cache: true,
-    incremental: true,
-    cacheDir: '.vite',
-    assetsInlineLimit: 4096,
-  }
 });
