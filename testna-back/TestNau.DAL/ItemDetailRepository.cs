@@ -62,5 +62,20 @@ namespace TestNau.DAL
                             WHERE id_code IN ({String.Join(",", codes)});";
             return _dbContext.getList<ItemDetailModel>(sql);
         }
+
+        public void DeleteList(List<int> codes)
+        {
+            string sql = $@"DELETE FROM item_detail
+                            WHERE id_code in ({String.Join(",", codes)});";
+            _dbContext.excecuteQuery(sql);
+        }
+
+        public void DeleteByDetail(int code)
+        {
+            string sql = $@"DELETE FROM item_detail
+                            WHERE id_cod_detail = {code};";
+            _dbContext.excecuteQuery(sql);
+        }
     }
+
 }

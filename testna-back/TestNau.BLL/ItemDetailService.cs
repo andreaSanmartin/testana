@@ -41,5 +41,10 @@ namespace TestNau.BLL
         {
             return _itemDetailRepository.GetByCodes(codes);
         }
+
+        public void DeleteByDetail(int code)
+        {
+            _itemDetailRepository.DeleteByDetail(code);
+        }
     }
 }

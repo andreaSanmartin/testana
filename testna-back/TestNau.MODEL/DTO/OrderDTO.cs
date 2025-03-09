@@ -49,19 +49,22 @@ namespace TestNau.MODEL.DTO
         public double ho_price { get; set; }
         public double ho_total_item { get; set; }
         public double? ho_sub_total_item { get; set; }
+        public double? ho_iva_item { get; set; }
 
         public List<ItemsDTO> Transform(List<ItemDetailModel> items, List<ItemModel> itemsname)
         {
             List<ItemsDTO> response = [];
-            items.ForEach(item => { 
-                ho_code_i = item.id_code;
-                ho_cod_item = item.id_cod_item;
-                ho_item_name = itemsname.Any() ?  itemsname.Find(p => p.it_code == item.id_cod_item).it_description :"";
-                ho_item_bar = itemsname.Any() ? itemsname.Find(p => p.it_code == item.id_cod_item).it_bar_code : "";
-                ho_amount = item.id_amount;
-                ho_price = item.id_price;
-                ho_total_item = item.id_total;
-                response.Add(this);
+            items.ForEach(item => {
+                ItemsDTO dataNew = new();
+                dataNew.ho_code_i = item.id_code;
+                dataNew.ho_cod_item = item.id_cod_item;
+                dataNew.ho_item_name = itemsname.Any() ?  itemsname.Find(p => p.it_code == item.id_cod_item).it_description :"";
+                dataNew.ho_item_bar = itemsname.Any() ? itemsname.Find(p => p.it_code == item.id_cod_item).it_bar_code : "";
+                dataNew.ho_amount = item.id_amount;
+                dataNew.ho_price = item.id_price;
+                dataNew.ho_total_item = item.id_total;
+                dataNew.ho_iva_item = itemsname.Any() ? itemsname.Find(p => p.it_code == item.id_cod_item).it_value_iva : 0;
+                response.Add(dataNew);
             });
             return response;
         }

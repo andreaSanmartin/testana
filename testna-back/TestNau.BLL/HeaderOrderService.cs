@@ -53,6 +53,13 @@ namespace TestNau.BLL
 
         public void SaveDTO(OrderDTO model)
         {
+            if (model.ho_items.Count == 0)
+                throw new Exception("Error debe tener items");
+
+            var exist = model.ho_items.FirstOrDefault(p => p.ho_cod_item == 0);
+            if (exist != null)
+                throw new Exception("Error debe tener items");
+
             HeaderOrderModel header = new()
             {
                 ho_code = model.ho_code,
@@ -101,31 +108,33 @@ namespace TestNau.BLL
 
             header = this.Update(header);
 
-            //DetailOrderModel detail = new()
-            //{
-            //    do_code = model.ho_cod_detail.Value,
-            //    do_cod_header = header.ho_code,
-            //    do_iva = model.ho_iva == true ? 1 : 0,
-            //    do_subtotal = model.ho_subtotal,
-            //    do_total = model.ho_total,
-            //};
+            DetailOrderModel detail = new()
+            {
+                do_code = model.ho_cod_detail.Value,
+                do_cod_header = header.ho_code,
+                do_iva = model.ho_iva == true ? 1 : 0,
+                do_subtotal = model.ho_subtotal,
+                do_total = model.ho_total,
+            };
 
-            //detail = _detailOrderService.Update(detail);
+            detail = _detailOrderService.Update(detail);
 
-            //model.ho_items.ForEach(item =>
-            //{
-            //    ItemDetailModel itemDetail = new()
-            //    {
-            //        id_code = item.ho_code_i.Value,
-            //        id_amount = item.ho_amount,
-            //        id_cod_detail = detail.do_code,
-            //        id_cod_item = item.ho_cod_item,
-            //        id_price = item.ho_price,
-            //        id_total = item.ho_total_item
-            //    };
+            _itemDetailService.DeleteByDetail(detail.do_code);
 
-            //    itemDetail = item.ho_code_i != null ? _itemDetailService.Update(itemDetail) : _itemDetailService.Save(itemDetail);
-            //});
+            model.ho_items.ForEach(item =>
+            {
+                ItemDetailModel itemDetail = new()
+                {
+                    id_code = item.ho_code_i.Value,
+                    id_amount = item.ho_amount,
+                    id_cod_detail = detail.do_code,
+                    id_cod_item = item.ho_cod_item,
+                    id_price = item.ho_price,
+                    id_total = item.ho_total_item
+                };
+
+                itemDetail = _itemDetailService.Save(itemDetail);
+            });
         }
 
 

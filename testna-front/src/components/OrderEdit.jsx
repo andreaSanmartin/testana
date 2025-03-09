@@ -17,13 +17,14 @@ const OrderEdit = () => {
     ? {
         ...originalOrder,
         ho_items: originalOrder.ho_items.map((item) => ({
+          code_pro: item.ho_code_i,
           product: item.ho_item_name,
           unitValue: item.ho_price,
           quantity: item.ho_amount,
           total: item.ho_total_item,
           barcode: item.ho_item_bar,
           subtotal: item.ho_sub_total_item,
-          it_value_iva: item.ho_iva ? 0.12 : 0,
+          it_value_iva: item.ho_iva_item,
         })),
       }
     : null;
@@ -55,6 +56,20 @@ const OrderEdit = () => {
   const [searchTermProduct, setSearchTermProduct] = useState("");
   const [loading, setLoading] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(null);
+  const [searchTerm, setSearchTerm] = useState("");
+
+  
+  const debounce = (func, delay) => {
+    let timeoutId;
+    return (...args) => {
+        if (timeoutId) {
+            clearTimeout(timeoutId);
+        }
+        timeoutId = setTimeout(() => {
+            func.apply(null, args);
+        }, delay);
+    };
+};
 
   useEffect(() => {
     const fetchData = async () => {
@@ -83,48 +98,6 @@ const OrderEdit = () => {
     }));
   };
 
-  const handleItemChange = (index, field, value) => {
-    const newItems = [...items];
-    const product = listItems.find(
-      (p) => p.it_description === newItems[index].product
-    );
-    if (field === "product") {
-      newItems[index].product = value;
-    } else if (field === "quantity") {
-      if (product && value > product.it_stock) {
-        showAlert(
-          `La cantidad ingresada supera el stock disponible (${product.it_stock})`,
-          "error"
-        );
-        return;
-      }
-      newItems[index].subtotal = newItems[index].unitValue * value;
-      newItems[index].total = iva
-        ? newItems[index].subtotal * (1 + newItems[index].it_value_iva)
-        : newItems[index].subtotal;
-    }
-
-    newItems[index][field] = value;
-    setItems(newItems);
-    calculateTotals(newItems);
-  };
-
-  const calculateTotals = (items) => {
-    const newSubtotal = items.reduce((sum, item) => sum + item.subtotal, 0);
-    const newTotal = items.reduce((sum, item) => sum + item.total, 0);
-    setSubtotal(newSubtotal);
-    setTotal(newTotal);
-  };
-
-  useEffect(() => {
-    const newItems = items.map((item) => ({
-      ...item,
-      total: iva ? item.subtotal * (1 + item.it_value_iva) : item.subtotal,
-    }));
-    setItems(newItems);
-    calculateTotals(newItems);
-  }, [iva]);
-
   const handleSearchClientChange = async (term) => {
     setSearchTermClient(term);
     if (term.trim() === "") {
@@ -151,13 +124,14 @@ const OrderEdit = () => {
     setItems([
       ...items,
       {
+        code_pro: 0,
         product: "",
         unitValue: 0,
         quantity: 0,
         total: 0,
         barcode: "",
         subtotal: 0,
-        it_value_iva: 0.12,
+        it_value_iva: 0.15,
       },
     ]);
   };
@@ -168,8 +142,63 @@ const OrderEdit = () => {
     calculateTotals(newItems);
   };
 
-  const handleProductChange = (index, product) => {
+  const handleItemChange = (index, field, value) => {
     const newItems = [...items];
+    const product = listItems.find(
+      (p) => p.it_description === newItems[index].product
+    );
+
+    if (field === "quantity") {
+      if (product && value > product.it_stock) {
+        showAlert(
+          `La cantidad ingresada supera el stock disponible (${product.it_stock})`,
+          "error"
+        );
+        return;
+      }
+      newItems[index].subtotal = newItems[index].unitValue * value;
+      newItems[index].total = iva
+        ? newItems[index].it_value_iva > 0
+          ? newItems[index].subtotal * newItems[index].it_value_iva
+          : newItems[index].subtotal
+        : newItems[index].subtotal;
+    }
+
+    newItems[index][field] = value;
+    setItems(newItems);
+    calculateTotals(newItems);
+  };
+
+  const searchProducts = async (term) => {
+    if (term.trim() === "") return;
+    const data = await getByDataItem(term);
+    setListItems(data);
+  };
+
+  const debouncedSearch = debounce(searchProducts, 2000);
+
+  useEffect(() => {
+    if (/^\d+$/.test(searchTerm)) {
+      debouncedSearch(searchTerm);
+      setError("");
+    } else if (searchTerm.trim() !== "") {
+      setError(
+        "Buscar solo por código de barras o código del producto (solo números)."
+      );
+    }
+  }, [searchTerm]);
+
+  const handleProductChange = (index, product) => {
+    const isDuplicate = items.some(
+      (item, i) => i !== index && item.product === product.it_description
+    );
+    if (isDuplicate) {
+      showAlert("Este producto ya está en la lista.", "error");
+      return;
+    }
+
+    const newItems = [...items];
+    newItems[index].code_pro = 0;
     newItems[index].product = product.it_description;
     newItems[index].unitValue = product.it_price;
     newItems[index].barcode = product.it_bar_code;
@@ -180,8 +209,27 @@ const OrderEdit = () => {
       : newItems[index].subtotal;
     setItems(newItems);
     calculateTotals(newItems);
-    setIsDropdownOpen(null);
   };
+
+  const calculateTotals = (items) => {
+    const newSubtotal = items.reduce((sum, item) => sum + item.subtotal, 0);
+    const newTotal = items.reduce((sum, item) => sum + item.total, 0);
+    setSubtotal(newSubtotal);
+    setTotal(newTotal);
+  };
+
+  useEffect(() => {
+    const newItems = items.map((item) => ({
+      ...item,
+      total: iva
+        ? item.it_value_iva > 0
+          ? item.subtotal * item.it_value_iva
+          : item.subtotal
+        : item.subtotal,
+    }));
+    setItems(newItems);
+    calculateTotals(newItems);
+  }, [iva]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -207,14 +255,16 @@ const OrderEdit = () => {
         ho_sub_total_item: item.subtotal || 0,
         ho_item_name: item.product,
         ho_item_bar: item.barcode,
-        ho_code_i: formData.ho_code,
+        ho_code_i: item.code_pro || 0,
       })),
     };
 
     try {
+      console.log(finalData);
+
       await updateOrder(finalData);
       showAlert("Orden actualizada correctamente", "success");
-      navigate("/orders/list");
+      navigate("/list");
     } catch (error) {
       console.error("Error updating order:", error);
       showAlert("Error al actualizar la orden", "error");
@@ -304,19 +354,30 @@ const OrderEdit = () => {
                   <td>
                     <input
                       type="text"
-                      value={item.product || ""}
-                      onChange={(e) =>
-                        handleItemChange(index, "product", e.target.value)
+                      className="input-field"
+                      value={
+                        isDropdownOpen === index ? searchTerm : item.product
                       }
                       onClick={() => setIsDropdownOpen(index)}
-                      onBlur={() => setTimeout(() => setIsDropdownOpen(null), 200)}
+                      onChange={(e) => {
+                        setSearchTerm(e.target.value);
+                        setIsDropdownOpen(index);
+                      }}
+                      onBlur={() => {
+                        setTimeout(() => setIsDropdownOpen(null), 200);
+                      }}
+                      placeholder="Buscar producto..."
                     />
                     {isDropdownOpen === index && (
-                      <ul className="dropdown">
+                      <ul className="absolute z-10 bg-white border border-gray-300 w-full max-h-40 overflow-y-auto">
                         {listItems.map((product) => (
                           <li
                             key={product.it_code}
-                            onClick={() => handleProductChange(index, product)}
+                            className="p-2 hover:bg-gray-100 cursor-pointer"
+                            onClick={() => {
+                              handleProductChange(index, product);
+                              setIsDropdownOpen(false);
+                            }}
                           >
                             {product.it_description}
                           </li>
